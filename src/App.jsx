@@ -1,18 +1,22 @@
 import { useEffect, useState } from 'react'
+import BookDetail from './components/bookDetail';
 import './App.css'
-const ACCESS_KEY = import.meta.env.VITE_APP_ACCESS_KEY; 
-const staticJson = 'meal_prep\staticJson.json';
 
 //  setList(staticJson);
 
 function App() {
-  const [list, setList] = useState(null)
+  const [list, setList] = useState(null);
+  const [searchInput, setSearchInput] = useState("");
 
-  const query = `https://api.spoonacular.com/recipes/?apiKey=${ACCESS_KEY}`;
+  //const query = `https://openlibrary.org/search.json?q=social+media`;
+
+  const query = `https://openlibrary.org/search.json?q=diane+mullen`;
+
+  
 
   useEffect(() => {
 
-    const fetchallFoodData = async (query) => {
+    const fetchallData = async (query) => {
       try {
         const response = await fetch(query);
         const json = await response.json(); 
@@ -22,31 +26,52 @@ function App() {
         console.error("Error fetching from API:", error);
     }}
 
-    fetchallFoodData(query)
+    fetchallData(query)
   }, []);
 
   return (
     <>
       <div>
-        <h1>Ingredient Prepper</h1>
+
+        <h1>Books:</h1>
+
+        {list?.num_found !== undefined && (
+        <p>Number of results found: {list.num_found}</p>
+        )}
+
+        {list?.num_found !== undefined && (
+        <p>Stat 2: {list.num_found}</p>
+        )}
+
+        {list?.num_found !== undefined && (
+        <p>Stat 3: {list.num_found}</p>
+        )}
+
+        <input
+          type="text"
+          placeholder="Search..."
+          onChange={(inputString) => searchItems(inputString.target.value)}
+        />
+
+        <label>Min Year:</label>
+        <input type="range" name="moonphase" min="1950" max="2025" step="5"></input>
+
         <ul>
-        {list &&
-            Object.entries(list)
-            .filter(([_, foodData]) => foodData.title)
+        {list?.docs &&
+            list.docs
+            .filter((book) => book.lending_edition_s)
             
-            .map(([key, value], idx) => (value && (
-                <li>{value}</li>
-
-            )))}
+            .map((book, idx) => (
+                //<li key={idx}>{book.title} {book.author_name} {book.first_publish_year}</li>
+                <BookDetail key={idx}
+                title={book.title} 
+                author={book.author_name}
+                year={book.first_publish_year}
+                cover_id={book.lending_edition_s}
+                />
+            ))}
         </ul>
 
-        <ul>
-          <li><strong>Title:</strong> {list.title}</li>
-          <li><strong>Servings:</strong> {list.servings}</li>
-          <li><strong>Ready in:</strong> {list.readyInMinutes} minutes</li>
-          <li><strong>Image:</strong> <img src={list.image} alt={recipe.title} width="200" /></li>
-          <li><strong>Source:</strong> <a href={list.sourceUrl} target="_blank" rel="noopener noreferrer">View Recipe</a></li>
-        </ul>
       </div>
     </>
   )
