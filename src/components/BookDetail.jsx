@@ -30,7 +30,7 @@ const BookDetail = ({ title, author, year, cover_id }) => {
         {coverUrl ? (
           <img src={coverUrl} alt={`${title} cover`} />
         ) : (
-          <p>`${title} cover`</p>
+          <p>${title} cover</p>
         )}
       </li>
     )
